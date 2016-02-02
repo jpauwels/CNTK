@@ -57,6 +57,11 @@
 #include <lapacke.h>
 #endif
 
+#ifdef USE_OPENBLAS
+    // Declare in case cblas.h is shared by all BLAS alternative implementations, e.g. on Ubuntu trusty
+    extern "C" void openblas_set_num_threads(int);
+#endif
+
 #define SWAP(a, b)  \
     {               \
         (a) ^= (b); \

@@ -1,0 +1,72 @@
+language: cpp
+
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: false
+      compiler: gcc
+      addons:
+        apt:
+          packages: [libopenblas-dev, liblapacke-dev, libboost-system-dev, libboost-filesystem-dev, libboost-test-dev]
+    - os: linux
+      dist: trusty
+      sudo: false
+      compiler: gcc-4.9
+      env: C_COMPILER=gcc-4.9 CXX_COMPILER=g++-4.9
+      addons:
+        apt:
+          sources: ubuntu-toolchain-r-test
+          packages: [g++-4.9, libopenblas-dev, liblapacke-dev, libboost-system-dev, libboost-filesystem-dev, libboost-test-dev]
+    - os: linux
+      dist: trusty
+      sudo: false
+      compiler: gcc-5
+      env: C_COMPILER=gcc-5 CXX_COMPILER=g++-5
+      addons:
+        apt:
+          sources: ubuntu-toolchain-r-test
+          packages: [g++-5, libopenblas-dev, liblapacke-dev, libboost-system-dev, libboost-filesystem-dev, libboost-test-dev]
+
+before_install:
+  - if [ "$C_COMPILER" != "" ]; then export CC=$C_COMPILER; fi
+  - if [ "$CXX_COMPILER" != "" ]; then export CXX=$CXX_COMPILER; fi
+
+install:
+  - export PATH=$HOME/mpi/bin:$PATH
+  - if [ ! $(command -v mpic++) ]; then
+      travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.3.tar.gz;
+      tar -xzf ./openmpi-1.10.3.tar.gz;
+      cd openmpi-1.10.3;
+      ./configure --prefix=$HOME/mpi --disable-mpi-fortran --disable-oshmem > /dev/null;
+      make all > /dev/null;
+      make install > /dev/null;
+      cd ..;
+    fi
+  - export PATH=$HOME/protobuf/bin:$PATH
+  - if [ ! $(command -v protoc) ]; then
+      PROTOBUF_VERSION=3.1.0;
+      PROTOBUF_STRING=protobuf-$PROTOBUF_VERSION;
+      travis_retry wget -O - --no-verbose https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz | tar -xzf -;
+      cd $PROTOBUF_STRING;
+      ./autogen.sh;
+      ./configure CFLAGS=-fPIC CXXFLAGS=-fPIC --disable-shared --prefix=$HOME/protobuf;
+      make install;
+      cd ..;
+      rm -rf $PROTOBUF_STRING;
+    fi
+
+before_script:
+  - sed -i"" 's/openblas_config.h/cblas.h/g' configure;
+  - sed -i"" 's/-lopenblas -lm -lpthread/-lopenblas -lm -lpthread -llapacke/g' Makefile;
+  - mkdir build/release -p
+  - cd build/release
+  - ../../configure --with-protobuf=$HOME/protobuf --with-openblas
+
+cache:
+  directories:
+  - $HOME/mpi
+  - $HOME/protobuf
+  
+script: make all
+
