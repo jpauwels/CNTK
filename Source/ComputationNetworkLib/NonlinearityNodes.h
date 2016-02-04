@@ -312,8 +312,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_diff;
 };
 
-template class SoftmaxNode<float>;
-template class SoftmaxNode<double>;
 
 // -----------------------------------------------------------------------
 // LogSoftmaxNode (input) -- log of soft-max over input vector(s)
@@ -379,8 +377,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_softmax;
 };
 
-template class LogSoftmaxNode<float>;
-template class LogSoftmaxNode<double>;
 
 // -----------------------------------------------------------------------
 // Hardmax(prediction)
@@ -423,8 +419,6 @@ public:
     }
 };
 
-template class HardmaxNode<float>;
-template class HardmaxNode<double>;
 
 // -----------------------------------------------------------------------
 // If (flag, ifValue, elseValue)

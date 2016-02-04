@@ -97,8 +97,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_leftMinusRight;
 };
 
-template class SquareErrorNode<float>;
-template class SquareErrorNode<double>;
 
 // -----------------------------------------------------------------------
 // CrossEntropyWithSoftmaxNode (labels, prediction)
@@ -223,8 +221,6 @@ protected:
     shared_ptr<Matrix<ElemType>> m_softmaxOfRight;
 };
 
-template class CrossEntropyWithSoftmaxNode<float>;
-template class CrossEntropyWithSoftmaxNode<double>;
 
 // -----------------------------------------------------------------------
 /// CrossEntropyNode (labels, prediction)
@@ -350,8 +346,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_leftDivRight;
 };
 
-template class CrossEntropyNode<float>;
-template class CrossEntropyNode<double>;
 
 // -----------------------------------------------------------------------
 // MatrixL1RegNode (input)
@@ -439,8 +433,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_gradientOfL1Norm; // temporary
 };
 
-template class MatrixL1RegNode<float>;
-template class MatrixL1RegNode<double>;
 
 // -----------------------------------------------------------------------
 // MatrixL2RegNode (input)
@@ -490,8 +482,6 @@ public:
     }
 };
 
-template class MatrixL2RegNode<float>;
-template class MatrixL2RegNode<double>;
 
 // -----------------------------------------------------------------------
 // NoiseContrastiveEstimationNode (labels, input, inputWeights, biasWeights)
@@ -675,8 +665,6 @@ protected:
 private:
     NCEEvalMode m_evalMode;
 };
-template class NoiseContrastiveEstimationNode<float>;
-template class NoiseContrastiveEstimationNode<double>;
 
 // -----------------------------------------------------------------------
 // ClassBasedCrossEntropyWithSoftmaxNode (labeldata(.,t), inputdata(.,t), embeddingMatrix, clsProbBeforeSoftmaxData(.,t))
@@ -938,8 +926,6 @@ protected:
     size_t m_totalNbrWords;
 };
 
-template class ClassBasedCrossEntropyWithSoftmaxNode<float>;
-template class ClassBasedCrossEntropyWithSoftmaxNode<double>;
 
 #ifdef COMING_SOON
 
@@ -1399,8 +1385,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_temp;
 };
 
-template class LogisticNode<float>;
-template class LogisticNode<double>;
 
 // -----------------------------------------------------------------------
 // DropoutNode (input) -- perform drop-out
@@ -1530,8 +1514,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_maskOfDropout;
 };
 
-template class DropoutNode<float>;
-template class DropoutNode<double>;
 
 // -----------------------------------------------------------------------
 // BatchNormalizationNode (input, scale, bias, runMean, runInvStdDev, spatial,
@@ -1900,7 +1882,5 @@ private:
     std::unique_ptr<BatchNormEngine<ElemType>> m_bnEng;
 };
 
-template class BatchNormalizationNode<float>;
-template class BatchNormalizationNode<double>;
 
 }}}

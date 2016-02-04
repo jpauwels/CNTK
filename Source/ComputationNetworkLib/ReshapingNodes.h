@@ -167,8 +167,6 @@ private:
     int m_endDimParameter;
 };
 
-template class ReshapeNode<float>;
-template class ReshapeNode<double>;
 
 // -----------------------------------------------------------------------
 // ReduceElements (op, axis=, input)
@@ -281,8 +279,6 @@ public:
     }
 };
 
-template class ReconcileDynamicAxisNode<float>;
-template class ReconcileDynamicAxisNode<double>;
 
 // -----------------------------------------------------------------------
 // SliceNode (input)
@@ -397,8 +393,6 @@ private:
     int m_axis;                   // note: axes are 1-based
 };
 
-template class SliceNode<float>;
-template class SliceNode<double>;
 
 // -----------------------------------------------------------------------
 // RowStack (input0, input1, ...)
@@ -540,8 +534,6 @@ private:
     int m_spliceDim;                    // tensor dimension according to which to stack (1-based)
 };
 
-template class RowStackNode<float>;
-template class RowStackNode<double>;
 
 // -----------------------------------------------------------------------
 // RowRepeatNode (input) -- duplicate row(s) of a matrix multiple times
@@ -841,8 +833,6 @@ public:
     }
 };
 
-template class DiagonalNode<float>;
-template class DiagonalNode<double>;
 
 // -----------------------------------------------------------------------
 // ReinterpretNodeBase (input) -- base class for nodes that reinterpret
@@ -1247,8 +1237,6 @@ private:
     }
 };
 
-template class LegacyReshapeNode<float>;
-template class LegacyReshapeNode<double>;
 
 /*
 

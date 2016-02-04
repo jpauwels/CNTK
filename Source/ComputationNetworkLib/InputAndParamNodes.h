@@ -346,8 +346,6 @@ public:
     }
 };
 
-template class InputValue<float>;
-template class InputValue<double>;
 
 // -----------------------------------------------------------------------
 // SparseInputValue (/*no input*/)
@@ -388,8 +386,6 @@ public:
     }
 };
 
-template class SparseInputValue<float>;
-template class SparseInputValue<double>;
 
 // -----------------------------------------------------------------------
 // EnvironmentInput (propertyName) -- read out environment properties
