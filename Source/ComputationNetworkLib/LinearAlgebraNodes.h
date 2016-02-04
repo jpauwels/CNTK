@@ -208,8 +208,6 @@ public:
     virtual bool InputUsedInComputingInputNodesGradients(size_t /*childIndex*/) const override { return true; }
 };
 
-template class ElementTimesNode<float>;
-template class ElementTimesNode<double>;
 
 // -----------------------------------------------------------------------
 // TimesNodeBase (A, B, outputRank=1)
@@ -492,8 +490,6 @@ public:
     }
 };
 
-template class TimesNode<float>;
-template class TimesNode<double>;
 
 // -----------------------------------------------------------------------
 // TransposeTimesNode (A', B)
@@ -519,8 +515,6 @@ public:
     }
 };
 
-template class TransposeTimesNode<float>;
-template class TransposeTimesNode<double>;
 
 // -----------------------------------------------------------------------
 // DiagTimesNode (vector representing the diagonal of a square matrix, data)
@@ -647,8 +641,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_rightGradient;
 };
 
-template class DiagTimesNode<float>;
-template class DiagTimesNode<double>;
 
 // -----------------------------------------------------------------------
 // SumElementsNode (input)
@@ -700,8 +692,6 @@ public:
     }
 };
 
-template class SumElementsNode<float>;
-template class SumElementsNode<double>;
 
 // -----------------------------------------------------------------------
 // TransposeDimensions (input, axis1, axis2)
@@ -945,8 +935,6 @@ private:
     shared_ptr<Matrix<ElemType>> m_temp;
 };
 
-template class CosDistanceNode<float>;
-template class CosDistanceNode<double>;
 
 // -----------------------------------------------------------------------
 // KhatriRaoProductNode (left, right)
@@ -1017,8 +1005,6 @@ public:
     }
 };
 
-template class KhatriRaoProductNode<float>;
-template class KhatriRaoProductNode<double>;
 
 // -----------------------------------------------------------------------
 // CosDistanceWithNegativeSamplesNode (left, right, shift, neg)

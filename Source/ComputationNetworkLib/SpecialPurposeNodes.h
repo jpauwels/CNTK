@@ -423,8 +423,6 @@ protected:
     shared_ptr<Matrix<ElemType>> m_temp;
 };
 
-template class GMMLogLikelihoodNode<float>;
-template class GMMLogLikelihoodNode<double>;
 
 #endif
 
@@ -669,8 +667,6 @@ protected:
     unsigned long long m_partialtime;
 };
 
-template class SequenceWithSoftmaxNode<float>;
-template class SequenceWithSoftmaxNode<double>;
 
 // -----------------------------------------------------------------------
 // DummyCriterionNode (objectiveValues, userSuppliedGradient, prediction)
@@ -759,7 +755,5 @@ public:
     }
 };
 
-template class DummyCriterionNode<float>;
-template class DummyCriterionNode<double>;
 
 } } }
