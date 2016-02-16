@@ -44,8 +44,12 @@
 #include <acml.h> // requires ACML 5.3.1 and above
 #elif defined(USE_MKL)
 // requires MKL 10.0 and above
-#include <mkl.h>
-#else
+#include <mkl_cblas.h>
+#include <mkl_clapack.h>
+#elif defined(USE_CBLAS_CLAPACK)
+#include <cblas.h>
+#include <clapack.h>
+#else //USE_CBLAS_LAPACKE
 #ifdef _MSC_VER
 // Visual Studio doesn't define standard complex types properly
 #define HAVE_LAPACK_CONFIG_H
@@ -55,10 +59,8 @@
 #include <lapacke.h>
 #endif
 
-#ifdef USE_ACML // MKL has one additional parameter for different matrix order
-#define BLAS_COLMAJOR
-#else
-#define BLAS_COLMAJOR (int) MatrixOrder::ColMajor,
+#ifndef USE_ACML // CBLAS has one additional parameter for different matrix order
+#define BLAS_COLMAJOR CBLAS_ORDER::CblasColMajor,
 #endif
 
 #ifdef USE_OPENBLAS
@@ -86,13 +88,6 @@ bool TracingGPUMemoryAllocator::IsTraceEnabled()
 {
     return (m_traceLevel > 0);
 }
-
-#pragma region Helpful Enum Definitions
-enum class MatrixOrder
-{
-    RowMajor = 101, // row-major arrays
-    ColMajor = 102  // column-major arrays
-};
 
 enum class MatrixTranspose : char
 {
@@ -4555,16 +4550,16 @@ void CPUMatrix<ElemType>::MultiplyAndWeightedAdd(ElemType alpha, const CPUMatrix
 #ifdef USE_ACML
         dgemm(transA, transB, m, n, k, alpha, reinterpret_cast<double*>(a.Data()), lda, reinterpret_cast<double*>(b.Data()), ldb, beta, reinterpret_cast<double*>(c.Data()), ldc);
 #else
-        cblas_dgemm((CBLAS_ORDER) BLAS_COLMAJOR mklTransA, mklTransB, m, n, k, alpha, reinterpret_cast<double*>(a.Data()), lda, reinterpret_cast<double*>(b.Data()), ldb, beta, reinterpret_cast<double*>(c.Data()), ldc);
+        cblas_dgemm(BLAS_COLMAJOR mklTransA, mklTransB, m, n, k, alpha, reinterpret_cast<double*>(a.Data()), lda, reinterpret_cast<double*>(b.Data()), ldb, beta, reinterpret_cast<double*>(c.Data()), ldc);
 #endif
     }
     else
     {
 #pragma warning(suppress : 4244)
 #ifdef USE_ACML
-        sgemm(BLAS_COLMAJOR transA, transB, m, n, k, alpha, reinterpret_cast<float*>(a.Data()), lda, reinterpret_cast<float*>(b.Data()), ldb, beta, reinterpret_cast<float*>(c.Data()), ldc);
+        sgemm(transA, transB, m, n, k, alpha, reinterpret_cast<float*>(a.Data()), lda, reinterpret_cast<float*>(b.Data()), ldb, beta, reinterpret_cast<float*>(c.Data()), ldc);
 #else
-        cblas_sgemm((CBLAS_ORDER) BLAS_COLMAJOR mklTransA, mklTransB, m, n, k, alpha, reinterpret_cast<float*>(a.Data()), lda, reinterpret_cast<float*>(b.Data()), ldb, beta, reinterpret_cast<float*>(c.Data()), ldc);
+        cblas_sgemm(BLAS_COLMAJOR mklTransA, mklTransB, m, n, k, alpha, reinterpret_cast<float*>(a.Data()), lda, reinterpret_cast<float*>(b.Data()), ldb, beta, reinterpret_cast<float*>(c.Data()), ldc);
 #endif
     }
 }
@@ -4612,13 +4607,13 @@ void CPUMatrix<ElemType>::SVD(const CPUMatrix<ElemType>& A, CPUMatrix<ElemType>&
     {
 #ifdef USE_ACML
         dgesvd('A', 'A', (int) m, (int) n, reinterpret_cast<double*>(A.Data()), (int) lda, reinterpret_cast<double*>(SIGMA.Data()), reinterpret_cast<double*>(U.Data()), (int) ldu, reinterpret_cast<double*>(VT.Data()), (int) ldvt, &info);
-#elif defined(USE_MKL)
+#elif defined(USE_MKL) || defined(USE_CBLAS_CLAPACK)
         double wkopt;
         int lwork = -1;
-        dgesvd("All", "All", &m, &n, reinterpret_cast<double*>(A.Data()), &lda, reinterpret_cast<double*>(SIGMA.Data()), reinterpret_cast<double*>(U.Data()), &ldu, reinterpret_cast<double*>(VT.Data()), &ldvt, &wkopt, &lwork, &info);
+        dgesvd((char*)"All", (char*)"All", &m, &n, reinterpret_cast<double*>(A.Data()), &lda, reinterpret_cast<double*>(SIGMA.Data()), reinterpret_cast<double*>(U.Data()), &ldu, reinterpret_cast<double*>(VT.Data()), &ldvt, &wkopt, &lwork, &info);
         lwork = (int) wkopt;
         W.RequireSize(lwork, 1);
-        dgesvd("All", "All", &m, &n, reinterpret_cast<double*>(A.Data()), &lda, reinterpret_cast<double*>(SIGMA.Data()), reinterpret_cast<double*>(U.Data()), &ldu, reinterpret_cast<double*>(VT.Data()), &ldvt, reinterpret_cast<double*>(W.Data()), &lwork, &info);
+        dgesvd((char*)"All", (char*)"All", &m, &n, reinterpret_cast<double*>(A.Data()), &lda, reinterpret_cast<double*>(SIGMA.Data()), reinterpret_cast<double*>(U.Data()), &ldu, reinterpret_cast<double*>(VT.Data()), &ldvt, reinterpret_cast<double*>(W.Data()), &lwork, &info);
 #else
         std::vector<double> superb(std::max(std::min(m, n) - 1, 1));
         info = LAPACKE_dgesvd(BLAS_COLMAJOR 'A', 'A', (int) m, (int) n, reinterpret_cast<double*>(A.Data()), (int) lda, reinterpret_cast<double*>(SIGMA.Data()),
@@ -4630,13 +4625,13 @@ void CPUMatrix<ElemType>::SVD(const CPUMatrix<ElemType>& A, CPUMatrix<ElemType>&
 #ifdef USE_ACML
 #pragma warning(suppress : 4244)
         sgesvd('A', 'A', (int) m, (int) n, reinterpret_cast<float*>(A.Data()), (int) lda, reinterpret_cast<float*>(SIGMA.Data()), reinterpret_cast<float*>(U.Data()), (int) ldu, reinterpret_cast<float*>(VT.Data()), (int) ldvt, &info);
-#elif defined(USE_MKL)
+#elif defined(USE_MKL) || defined(USE_CBLAS_CLAPACK)
         float wkopt;
         int lwork = -1;
-        sgesvd("All", "All", &m, &n, reinterpret_cast<float*>(A.Data()), &lda, reinterpret_cast<float*>(SIGMA.Data()), reinterpret_cast<float*>(U.Data()), &ldu, reinterpret_cast<float*>(VT.Data()), &ldvt, &wkopt, &lwork, &info);
+        sgesvd((char*)"All", (char*)"All", &m, &n, reinterpret_cast<float*>(A.Data()), &lda, reinterpret_cast<float*>(SIGMA.Data()), reinterpret_cast<float*>(U.Data()), &ldu, reinterpret_cast<float*>(VT.Data()), &ldvt, &wkopt, &lwork, &info);
         lwork = (int) wkopt;
         W.RequireSize(lwork, 1);
-        sgesvd("All", "All", &m, &n, reinterpret_cast<float*>(A.Data()), &lda, reinterpret_cast<float*>(SIGMA.Data()), reinterpret_cast<float*>(U.Data()), &ldu, reinterpret_cast<float*>(VT.Data()), &ldvt, reinterpret_cast<float*>(W.Data()), &lwork, &info);
+        sgesvd((char*)"All", (char*)"All", &m, &n, reinterpret_cast<float*>(A.Data()), &lda, reinterpret_cast<float*>(SIGMA.Data()), reinterpret_cast<float*>(U.Data()), &ldu, reinterpret_cast<float*>(VT.Data()), &ldvt, reinterpret_cast<float*>(W.Data()), &lwork, &info);
 #else
         std::vector<float> superb(std::max(std::min(m, n) - 1, 1));
         info = LAPACKE_sgesvd(BLAS_COLMAJOR 'A', 'A', (int) m, (int) n, reinterpret_cast<float*>(A.Data()), (int) lda, reinterpret_cast<float*>(SIGMA.Data()),

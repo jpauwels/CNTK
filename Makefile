@@ -19,7 +19,7 @@
 #     only needed if MATHLIB=mkl
 #   GDK_PATH= path to cuda gdk installation, so $(GDK_PATH)/include/nvidia/gdk/nvml.h exists
 #     defaults to /usr
-#   MATHLIB= One of acml or mkl
+#   MATHLIB= One of acml, mkl, openblas or veclib 
 #     defaults to acml
 #   CUDA_PATH= Path to CUDA
 #     If not specified, GPU will not be enabled
@@ -164,6 +164,13 @@ ifeq ("$(MATHLIB)","openblas")
   LIBPATH += $(OPENBLAS_PATH)/lib
   LIBS += -lopenblas -lm -lpthread
   CPPFLAGS += -DUSE_OPENBLAS
+endif
+
+ifeq ("$(MATHLIB)","veclib")
+  INCLUDEPATH += $(VECLIB_PATH)/Headers
+  LIBPATH += $(VECLIB_PATH)/Versions/A/
+  LIBS += -lBLAS -lLAPACK
+  CPPFLAGS += -DUSE_CBLAS_CLAPACK
 endif
 
 

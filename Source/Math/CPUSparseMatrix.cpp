@@ -33,8 +33,12 @@
 #include <acml.h> // requires ACML 5.3.0 and above
 #elif defined(USE_MKL)
 // requires MKL 10.0 and above
-#include <mkl.h>
-#else
+#include <mkl_cblas.h>
+#include <mkl_clapack.h>
+#elif defined(USE_CBLAS_CLAPACK)
+#include <cblas.h>
+#include <clapack.h>
+#else //USE_CBLAS_LAPACKE
 #ifdef _MSC_VER
 // Visual Studio doesn't define standard complex types properly
 #define HAVE_LAPACK_CONFIG_H
@@ -53,10 +57,8 @@
 //    return 42;
 //}
 
-#ifdef USE_ACML // MKL has one additional parameter for different matrix order
-#define BLAS_COLMAJOR
-#else
-#define BLAS_COLMAJOR (int) MatrixOrder::ColMajor,
+#ifndef USE_ACML // CBLAS has one additional parameter for different matrix order
+#define BLAS_COLMAJOR CBLAS_ORDER::CblasColMajor,
 #endif
 
 // TODO: Move to CommonMatrix.h
@@ -65,13 +67,6 @@
 namespace Microsoft { namespace MSR { namespace CNTK {
 
 #pragma region Helpful Enum Definitions
-
-enum class MatrixOrder
-{
-    RowMajor = 101, // row-major arrays
-    ColMajor = 102  // column-major arrays
-};
-
 enum class MatrixTranspose : char
 {
     NoTrans   = 'N', // trans='N'
