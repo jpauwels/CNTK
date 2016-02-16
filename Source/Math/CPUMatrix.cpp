@@ -46,6 +46,10 @@
 // requires MKL 10.0 and above
 #include <mkl_cblas.h>
 #include <mkl_clapack.h>
+#elif defined(USE_FLAME)
+#include <cblas.h>
+#include <lapack2flame.h>
+//init_flame
 #elif defined(USE_CBLAS_CLAPACK)
 #include <cblas.h>
 #include <clapack.h>

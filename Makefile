@@ -156,6 +156,7 @@ ifeq ("$(MATHLIB)","mkl")
       LIBPATH += $(MKL_PATH)/$(CNTK_CUSTOM_MKL_VERSION)/x64/parallel
       LIBS += -lmkl_cntk_p -liomp5 -lpthread
     endif
+  endif
   COMMON_FLAGS += -DUSE_MKL
 endif
 
@@ -171,6 +172,13 @@ ifeq ("$(MATHLIB)","veclib")
   LIBPATH += $(VECLIB_PATH)/Versions/A/
   LIBS += -lBLAS -lLAPACK
   CPPFLAGS += -DUSE_CBLAS_CLAPACK
+endif
+
+ifeq ("$(MATHLIB)","flame")
+  INCLUDEPATH += $(FLAME_PATH)/include/blis
+  LIBPATH += $(FLAME_PATH)/lib
+  LIBS += -lblis
+  CPPFLAGS += -DUSE_FLAME
 endif
 
 

@@ -36,6 +36,11 @@ have_veclib=no
 veclib_path=
 veclib_check=Headers/cblas.h
 
+# Flame support
+have_flame=no
+flame_path=
+flame_check=include/blis/cblas.h
+
 have_kaldi=no
 kaldi_path=
 kaldi_check=src/kaldi.mk
@@ -79,6 +84,7 @@ default_acmls="acml5.3.1/ifort64_mp"
 default_mkls="CNTKCustomMKL"
 default_openblas=""
 default_veclib="System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework"
+default_flame=""
 
 # NOTE: Will get compilation errors with cuda-6.0
 default_cudas="cuda-7.5:cuda-7.0:cuda-6.5"
@@ -143,6 +149,11 @@ function find_openblas ()
 function find_veclib ()
 {
     find_dir "$default_veclib" "$veclib_check"
+}
+
+function find_flame ()
+{
+    find_dir "$default_flame" "$flame_check"
 }
 
 function find_cuda ()
@@ -234,6 +245,7 @@ function show_help ()
     echo "  --with-mkl-sequential[=directory] $(show_default "$(find_mkl)")"
     echo "  --with-openblas[=directory] (experimental) $(show_default "$(find_openblas)")"
     echo "  --with-veclib[=directory] $(show_default "$(find_veclib)")"
+    echo "  --with-flame[=directory] $(show_default "$(find_flame)")"
     echo "  --with-buildtype=(debug|release) $(show_default $default_buildtype)"
     echo "  --with-kaldi[=directory] $(show_default "$(find_kaldi)")"
     echo "  --with-opencv[=directory] $(show_default "$(find_opencv)")"
@@ -485,6 +497,28 @@ do
                 fi
             fi
             ;;
+        --with-flame*)
+            have_flame=yes
+            mathlib=flame
+            if test x"$optarg" = x
+            then
+                flame_path="$(find_flame)"
+                if test x"$flame_path" = x
+                then
+                    echo "Cannot find FLAME directory"
+                    echo "Please specify a value for --with-flame"
+                    exit 1
+                fi
+            else
+                if test $(check_dir "$optarg" $flame_check) = yes
+                then
+                    flame_path="$optarg"
+                else
+                    echo "Invalid FLAME directory $optarg"
+                    exit 1
+                fi
+            fi
+            ;;
         --with-buildtype*)
             have_buildtype=yes
             case $optarg in
@@ -576,8 +610,8 @@ then
     echo Defaulting to --with-buildtype=release
 fi
 
-# If no math library was specified, search for acml, mkl or vecLib (in this order)
-if test x$have_acml = xno && test x$have_mkl = xno && test x$have_openblas = xno && test x$have_veclib = xno
+# If no math library was specified, search for acml, mkl, vecLib or FLAME (in this order)
+if test x$have_acml = xno && test x$have_mkl = xno && test x$have_openblas = xno && test x$have_veclib = xno && test x$have_flame = xno
 then
     acml_path="$(find_acml)"
     if test x"$acml_path" = x
@@ -588,9 +622,15 @@ then
             veclib_path="$(find_veclib)"
             if test x"$veclib_path" = x
             then
-                echo "Cannot find a CPU math library."
-                echo "Please specify --with-acml, --with-mkl, --with-mkl-sequential, --with-openblas or --with-veclib with a path."
-                exit 1
+                flame_path="$(find_flame)"
+                if test x"$flame_path" = x
+                then
+                    echo "Cannot find a CPU math library."
+                    echo "Please specify --with-acml, --with-mkl, --with-mkl-sequential, --with-openblas, --with-veclib or --with-flame with a path."
+                    exit 1
+                else
+                    mathlib=flame
+                fi
             else
                 mathlib=veclib
             fi
@@ -603,7 +643,7 @@ then
 fi
 
 # If no cuda library specified, search for one
-if test x$enable_cuda = xyes && test x$cuda_path = x
+if test x$enable_cuda = xyes && test x"$cuda_path" = x
 then
     cuda_path="$(find_cuda)"
     if test x"$cuda_path" = x ; then
@@ -615,7 +655,7 @@ then
     fi
 fi
 
-if test $enable_cuda = yes && test x$gdk_path = x
+if test $enable_cuda = yes && test x"$gdk_path" = x
 then
     gdk_path="$(find_gdk)"
     if test x"$gdk_path" = x ; then
@@ -627,7 +667,7 @@ then
     fi
 fi
 
-if test $enable_cuda = yes && test x$cub_path = x
+if test $enable_cuda = yes && test x"$cub_path" = x
 then
     cub_path="$(find_cub)"
     if test x"$cub_path" = x ; then
@@ -640,7 +680,7 @@ then
     fi
 fi
 
-if test $enable_cuda = yes && test x$cudnn_path = x
+if test $enable_cuda = yes && test x"$cudnn_path" = x
 then
     cudnn_path="$(find_cudnn)"
     if test x"$cudnn_path" = x ; then
@@ -673,7 +713,7 @@ then
     fi
 fi
 
-if test x$kaldi_path = x
+if test x"$kaldi_path" = x
 then
     kaldi_path="$(find_kaldi)"
     if test x"$kaldi_path" = x ; then
@@ -704,6 +744,9 @@ case $mathlib in
     veclib)
         echo VECLIB_PATH=\"$veclib_path\" >> "$config"
         ;;
+    flame)
+        echo FLAME_PATH=\"$flame_path\" >> "$config"
+        ;;
 esac
 if test $enable_cuda = yes ; then
     echo CUDA_PATH=\"$cuda_path\" >> "$config"
@@ -717,7 +760,7 @@ fi
 if test x"$opencv_path" != x ; then
     echo OPENCV_PATH=\"$opencv_path\" >> "$config"
 fi
-if test x$libzip_path != x ; then
+if test x"$libzip_path" != x ; then
     echo LIBZIP_PATH=\"$libzip_path\" >> "$config"
 fi
 if test $enable_1bitsgd = yes ; then
