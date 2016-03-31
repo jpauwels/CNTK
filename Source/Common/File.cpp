@@ -20,8 +20,7 @@
 #include <VersionHelpers.h>
 #include <Shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
-#endif
-#ifdef __unix__
+#else
 #include <unistd.h>
 #include <linux/limits.h> // for PATH_MAX
 #endif
