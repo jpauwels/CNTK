@@ -12,8 +12,7 @@
 #ifdef _WIN32
 #define NOMINMAX
 #include "Windows.h"
-#endif
-#ifdef __unix__
+#else
 #include <unistd.h>
 #endif
 #include "fileutil.h" // for f{ge,pu}t{,Text}()

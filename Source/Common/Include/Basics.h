@@ -15,8 +15,7 @@
 #include <stdarg.h>
 #ifdef _WIN32
 #include <Windows.h>
-#endif
-#if __unix__
+#else
 #include <dlfcn.h> // for Plugin
 #endif
 #include <cctype>
