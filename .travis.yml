@@ -8,7 +8,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: [libopenblas-dev, liblapacke-dev, libboost-system-dev, libboost-filesystem-dev, libboost-test-dev]
+          packages: [libopenblas-dev, liblapacke-dev]
     - os: linux
       dist: trusty
       sudo: false
@@ -17,7 +17,7 @@ matrix:
       addons:
         apt:
           sources: ubuntu-toolchain-r-test
-          packages: [g++-4.9, libopenblas-dev, liblapacke-dev, libboost-system-dev, libboost-filesystem-dev, libboost-test-dev]
+          packages: [g++-4.9, libopenblas-dev, liblapacke-dev]
     - os: linux
       dist: trusty
       sudo: false
@@ -26,7 +26,7 @@ matrix:
       addons:
         apt:
           sources: ubuntu-toolchain-r-test
-          packages: [g++-5, libopenblas-dev, liblapacke-dev, libboost-system-dev, libboost-filesystem-dev, libboost-test-dev]
+          packages: [g++-5, libopenblas-dev, liblapacke-dev]
 
 before_install:
   - if [ "$C_COMPILER" != "" ]; then export CC=$C_COMPILER; fi
@@ -55,6 +55,16 @@ install:
       cd ..;
       rm -rf $PROTOBUF_STRING;
     fi
+  - if [ ]; then
+      BOOST_VERSION=1_60_0;
+      BOOST_DOTTED_VERSION=$(echo $BOOST_VERSION | tr _ .);
+      travis_retry wget -q -O - https://sourceforge.net/projects/boost/files/boost/${BOOST_DOTTED_VERSION}/boost_${BOOST_VERSION}.tar.gz/download | tar -xzf -;
+      cd boost_${BOOST_VERSION};
+      ./bootstrap.sh --prefix=$HOME/boost --with-libraries=filesystem,system,test;
+      ./b2 -d0 -j"$(nproc)" install;
+      cd ..;
+      rm -rf boost_${BOOST_VERSION};
+    fi
 
 before_script:
   - sed -i"" 's/openblas_config.h/cblas.h/g' configure
@@ -67,8 +77,9 @@ cache:
   directories:
   - $HOME/mpi
   - $HOME/protobuf
+  - $HOME/boost
   
 script:
-  - ../../configure --with-protobuf=$HOME/protobuf --with-openblas
-  - BOOST_LIBRARYDIR=/usr/lib/x86_64-linux-gnu make -j2 all
+  - ../../configure --with-openblas --with-protobuf=$HOME/protobuf --with-boost=$HOME/boost
+  - make -j2 all
 
