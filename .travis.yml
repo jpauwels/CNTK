@@ -8,7 +8,7 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          packages: [libopenblas-dev, liblapacke-dev]
+          packages: [libopenblas-dev, liblapacke-dev, libzip-dev]
     - os: linux
       dist: trusty
       sudo: false
@@ -17,7 +17,7 @@ matrix:
       addons:
         apt:
           sources: ubuntu-toolchain-r-test
-          packages: [g++-4.9, libopenblas-dev, liblapacke-dev]
+          packages: [g++-4.9, libopenblas-dev, liblapacke-dev, libzip-dev]
     - os: linux
       dist: trusty
       sudo: false
@@ -26,7 +26,7 @@ matrix:
       addons:
         apt:
           sources: ubuntu-toolchain-r-test
-          packages: [g++-5, libopenblas-dev, liblapacke-dev]
+          packages: [g++-5, libopenblas-dev, liblapacke-dev, libzip-dev]
 
 before_install:
   - if [ "$C_COMPILER" != "" ]; then export CC=$C_COMPILER; fi
@@ -69,7 +69,7 @@ install:
       OPENCV_VERSION=3.1.0;
       travis_retry wget -q -O - https://github.com/Itseez/opencv/archive/${OPENCV_VERSION}.tar.gz | tar -xzf -;
       cd opencv-${OPENCV_VERSION};
-      cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$HOME/opencv -DBUILD_opencv_flann=OFF -DBUILD_opencv_ml=OFF -DBUILD_opencv_photo=OFF -DBUILD_opencv_video=OFF -DBUILD_opencv_shape=OFF -DBUILD_opencv_videoio=OFF -DBUILD_opencv_highgui=OFF -DBUILD_opencv_objdetect=OFF -DBUILD_opencv_superres=OFF -DBUILD_opencv_ts=OFF -DBUILD_opencv_features2d=OFF -DBUILD_opencv_calib3d=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_stitching=OFF -DBUILD_opencv_videostab =OFF -DBUILD_opencv_world .;
+      cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$HOME/opencv -DBUILD_opencv_flann=OFF -DBUILD_opencv_ml=OFF -DBUILD_opencv_photo=OFF -DBUILD_opencv_video=OFF -DBUILD_opencv_shape=OFF -DBUILD_opencv_videoio=OFF -DBUILD_opencv_highgui=OFF -DBUILD_opencv_objdetect=OFF -DBUILD_opencv_superres=OFF -DBUILD_opencv_ts=OFF -DBUILD_opencv_features2d=OFF -DBUILD_opencv_calib3d=OFF -DBUILD_opencv_java=OFF -DBUILD_opencv_stitching=OFF -DBUILD_opencv_videostab=OFF -DBUILD_opencv_world=OFF .;
       make -j2 install;
       cd ..;
       rm -rf opencv-${OPENCV_VERSION};
