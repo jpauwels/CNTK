@@ -55,13 +55,14 @@ install:
       cd ..;
       rm -rf $PROTOBUF_STRING;
     fi
-  - if [ ]; then
+  - if [ ! -d $HOME/boost/include]; then
       BOOST_VERSION=1_60_0;
       BOOST_DOTTED_VERSION=$(echo $BOOST_VERSION | tr _ .);
       travis_retry wget -q -O - https://sourceforge.net/projects/boost/files/boost/${BOOST_DOTTED_VERSION}/boost_${BOOST_VERSION}.tar.gz/download | tar -xzf -;
       cd boost_${BOOST_VERSION};
       ./bootstrap.sh --prefix=$HOME/boost --with-libraries=filesystem,system,test;
-      ./b2 -d0 -j"$(nproc)" install;
+      ./b2 -d0 -j2 install;
+      ls;
       cd ..;
       rm -rf boost_${BOOST_VERSION};
     fi
