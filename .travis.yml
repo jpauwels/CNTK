@@ -63,6 +63,7 @@ before_script:
   - cd build/release
 
 cache:
+  ccache: true
   directories:
   - $HOME/mpi
   - $HOME/protobuf
