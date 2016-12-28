@@ -58,7 +58,7 @@ install:
 
 before_script:
   - sed -i"" 's/openblas_config.h/cblas.h/g' configure;
-  - sed -i"" 's/-lopenblas -lm -lpthread/-lopenblas -lm -lpthread -llapacke/g' Makefile;
+  - sed -i"" 's/openblas m pthread/openblas m pthread lapacke/g' Makefile;
   - mkdir build/release -p
   - cd build/release
   - ../../configure --with-protobuf=$HOME/protobuf --with-openblas
@@ -68,5 +68,5 @@ cache:
   - $HOME/mpi
   - $HOME/protobuf
   
-script: make all
+script: #make all
 
