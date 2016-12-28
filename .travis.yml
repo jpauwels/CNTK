@@ -69,5 +69,5 @@ cache:
   
 script:
   - ../../configure --with-protobuf=$HOME/protobuf --with-openblas
-  - make all
+  - make -j2 all
 
