@@ -65,12 +65,13 @@ install:
       cd ..;
       rm -rf boost_${BOOST_VERSION};
     fi
-  - if [ ! -d $HOME/opencv ]; then
+  - if [ ! -d $HOME/opencv/include ]; then
       OPENCV_VERSION=3.1.0;
       travis_retry wget -q -O - https://github.com/Itseez/opencv/archive/${OPENCV_VERSION}.tar.gz | tar -xzf -;
       cd opencv-${OPENCV_VERSION};
       cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$HOME/opencv .;
       make -j2 install;
+      ls;
       cd ..;
       rm -rf opencv-${OPENCV_VERSION};
     fi
