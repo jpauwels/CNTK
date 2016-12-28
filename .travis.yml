@@ -69,5 +69,5 @@ cache:
   
 script:
   - ../../configure --with-protobuf=$HOME/protobuf --with-openblas
-  - make -j2 all
+  - BOOST_LIBRARYDIR=/usr/lib/x86_64-linux-gnu make -j2 all
 
