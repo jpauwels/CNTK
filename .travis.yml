@@ -27,13 +27,6 @@ matrix:
         apt:
           sources: ubuntu-toolchain-r-test
           packages: [g++-5, libopenblas-dev, liblapacke-dev, libzip-dev]
-    - os: linux
-      dist: trusty
-      sudo: false
-      compiler: clang
-      addons:
-        apt:
-          packages: [libopenblas-dev, liblapacke-dev, libzip-dev]
 
 before_install:
   - if [ "$C_COMPILER" != "" ]; then export CC=$C_COMPILER; fi
@@ -42,11 +35,11 @@ before_install:
 install:
   - export PATH=$HOME/mpi/bin:$PATH
   - if [ ! $(command -v mpic++) ]; then
-      travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/openmpi-1.10.3.tar.gz;
-      tar -xzf ./openmpi-1.10.3.tar.gz;
-      cd openmpi-1.10.3;
+      OPENMPI_VERSION=openmpi-1.10.3;
+      travis_retry wget --no-check-certificate https://www.open-mpi.org/software/ompi/v1.10/downloads/$OPENMPI_VERSION.tar.gz | tar -xzf -;
+      cd $OPENMPI_VERSION;
       ./configure --prefix=$HOME/mpi --disable-mpi-fortran --disable-oshmem > /dev/null;
-      make all > /dev/null;
+      make -j2 all > /dev/null;
       make install > /dev/null;
       cd ..;
     fi
@@ -58,7 +51,7 @@ install:
       cd $PROTOBUF_STRING;
       ./autogen.sh;
       ./configure CFLAGS=-fPIC CXXFLAGS=-fPIC --disable-shared --prefix=$HOME/protobuf;
-      make install;
+      make -j2 install;
       cd ..;
       rm -rf $PROTOBUF_STRING;
     fi
